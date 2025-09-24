@@ -1,0 +1,14 @@
+---
+title: "p8105_hw2_yz5248"
+author: "yz5248"
+date: "2025-09-24"
+output: github_document
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(readr)
+library(readxl)
+```
+
