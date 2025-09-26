@@ -8,6 +8,8 @@ output: github_document
 ```{r}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(tidyverse)
+library(lubridate)
+library(janitor)
 library(readr)
 library(readxl)
 ```
@@ -119,6 +121,37 @@ gwynnda = read_excel(
   )
 
 trash_wheel_data = bind_rows(mr_trash_wheel, prof_trash_wheel, gwynnda)
+```
+
+
+Problem 3. 
+```{r}
+zip_df = read_csv(
+  "zillow_data/Zip Codes.csv"
+  ) |> 
+  janitor::clean_names()
+
+zori_wide = read_csv(
+  "zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv"
+  ) |> 
+  janitor::clean_names()
+```
+
+```{r}
+zori_long = zori_wide |>
+  pivot_longer(
+    cols = starts_with("x"),  
+    names_to = "date",
+    values_to = "zori"
+  ) |>
+  mutate(
+    date = ymd(str_remove(date, "^x")),  
+    zori = as.numeric(zori),
+    zip = str_pad(region_name, 5, pad = "0")  
+  ) |>
+  drop_na(zori)
+
+view(zori_long)
 ```
 
 
