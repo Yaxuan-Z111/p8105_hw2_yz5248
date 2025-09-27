@@ -14,11 +14,8 @@ library(readr)
 library(readxl)
 ```
 
-Problem 1.   
-First, clean the data in pols-month.csv.  
-Breaking up the variable mon into integer variables year, month, and day.  
-Replacing month number with month name.  
-Creating a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
+#Problem 1.   
+Dealing with the data in pols-month.csv.  
 ```{r}
 pols_df = read_csv("fivethirtyeight_datasets/pols-month.csv")|>
   separate(mon, into = c("year", "month", "day"), sep = "-") |>
@@ -31,8 +28,9 @@ pols_df = read_csv("fivethirtyeight_datasets/pols-month.csv")|>
   select(-prez_gop, -prez_dem, -day)
 pols_df
 ```
+pols_df from FiveThirtyEight contains 822 monthly observations of political office holdings in the United States, spanning the years 1947 to 2014. Each observation related to the number of national politicians who are democratic or republican at any given time, including gov_gop and gov_dem (number of Republican and Democratic governors), sen_gop and sen_dem (senators), and rep_gop and rep_dem (representatives). The dataset also includes indicators for the party of the sitting president (prez_gop and prez_dem). The 'mon' variable in the original file was converted to separate 'year' and 'month' columns for clarity.   
 
-
+Dealing with the data in snp.csv.  
 ```{r}
 snp_df = read_csv("fivethirtyeight_datasets/snp.csv") |>
   separate(date, into = c("month", "day", "year"), sep = "/") |> 
@@ -45,7 +43,9 @@ snp_df = read_csv("fivethirtyeight_datasets/snp.csv") |>
   arrange(year, match(month, month.name))
 snp_df
 ```
+snp_df dataset related to Standard & Poor’s stock market index (S&P), often used as a representative measure of stock market as a whole and provided for this analysis contains 787 monthly observations from 1951 onward, with two key variables: date, the observation date, and close, the closing value of the S&P 500 index on that date.   
 
+Dealing with the data in unemployment.cvs
 ```{r}
 unemp_df = read_csv("fivethirtyeight_datasets/unemployment.csv")|>
   pivot_longer(
@@ -62,7 +62,9 @@ unemp_df = read_csv("fivethirtyeight_datasets/unemployment.csv")|>
 unemp_df
 
 ```
+unemp_df dataset contains monthly U.S. unemployment rates from 1948 to 2015, with 816 observations and three variables: year, month, and unemployment rate in the month of the associated year.
 
+Merging the datasets and give brief discription
 ```{r}
 merged_df = pols_df |>
   left_join(snp_df, by = c("year", "month")) |>
@@ -79,9 +81,9 @@ tibble(
   Year_Max = max(merged_df$year, na.rm = TRUE)
 )
 ```
+resulting dataset is a tidy, merged compilation of political, economic, and financial data, containing 822 rows and 11 variables, spanning the years 1947 to 2015. Key variables include 'year' and 'month' to identify the time period, political seat counts for Republicans and Democrats in the House and Senate (gov_gop, sen_gop, rep_gop, gov_dem, sen_dem, rep_dem), the party of the sitting president (president), the monthly closing value of the S&P 500 (close), and the monthly U.S. unemployment rate (unemployment). 
 
-
-Problem 2. 
+#Problem 2. 
 
 ```{r}
 mr_trash_wheel = read_excel(
@@ -123,7 +125,7 @@ trash_wheel_data = bind_rows(mr_trash_wheel, prof_trash_wheel, gwynnda)
 ```
 
 
-Problem 3. 
+#Problem 3. 
 ```{r}
 zip_df = read_csv(
   "zillow_data/Zip Codes.csv"
