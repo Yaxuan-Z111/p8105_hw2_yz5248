@@ -8,6 +8,7 @@ output: github_document
 ```{r}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(tidyverse)
+library(dplyr)
 library(lubridate)
 library(janitor)
 library(readr)
@@ -129,7 +130,9 @@ Problem 3.
 zip_df = read_csv(
   "zillow_data/Zip Codes.csv"
   ) |> 
-  janitor::clean_names()
+  janitor::clean_names() |>
+  mutate(zip = str_pad(as.character(zip_code), 5, pad = "0")) |>
+  distinct(zip, .keep_all = TRUE)
 
 zori_wide = read_csv(
   "zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv"
@@ -153,5 +156,20 @@ zori_long = zori_wide |>
 
 view(zori_long)
 ```
+
+
+```{r}
+zori_merged = zori_long |>
+  left_join(zip_df, by = "zip") |>
+  select(zip, county, neighborhood, date, zori, everything())
+
+zori_merged
+```
+
+The dataset contains `r nrow(zori_merged)` total observations, covering `r n_distinct(zori_long$zip)` unique ZIP codes in the ZORI data and `r n_distinct(zip_df$zip)` unique ZIP codes in the lookup table. The number of unique neighborhoods is `r n_distinct(zip_df$neighborhood)`.
+
+
+
+
 
 
