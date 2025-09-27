@@ -8,7 +8,6 @@ output: github_document
 ```{r}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(tidyverse)
-library(dplyr)
 library(lubridate)
 library(janitor)
 library(readr)
