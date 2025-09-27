@@ -14,13 +14,13 @@ library(readr)
 library(readxl)
 ```
 
-Problem 1. 
+Problem 1.   
 First, clean the data in pols-month.csv.  
 Breaking up the variable mon into integer variables year, month, and day.  
 Replacing month number with month name.  
 Creating a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
 ```{r}
-pols_clean = read_csv("fivethirtyeight_datasets/pols-month.csv")|>
+pols_df = read_csv("fivethirtyeight_datasets/pols-month.csv")|>
   separate(mon, into = c("year", "month", "day"), sep = "-") |>
   mutate(
     year = as.integer(year),
@@ -29,29 +29,25 @@ pols_clean = read_csv("fivethirtyeight_datasets/pols-month.csv")|>
     president = if_else(prez_gop == 1, "gop", "dem")
   ) |>
   select(-prez_gop, -prez_dem, -day)
-
-
-
+pols_df
 ```
 
 
 ```{r}
-
-snp_clean = read_csv("fivethirtyeight_datasets/snp.csv") |>
+snp_df = read_csv("fivethirtyeight_datasets/snp.csv") |>
   separate(date, into = c("month", "day", "year"), sep = "/") |> 
   mutate(
-    # 把 year 转成 4 位数
     year = as.integer(if_else(as.integer(year) > 50, paste0("19", year), paste0("20", year))),
     month = as.integer(month),
     month = month.name[month]
   ) |>
   select(year, month, close) |>
   arrange(year, match(month, month.name))
-
+snp_df
 ```
 
 ```{r}
-unemp_clean = unemp <- read_csv("fivethirtyeight_datasets/unemployment.csv")|>
+unemp_df = read_csv("fivethirtyeight_datasets/unemployment.csv")|>
   pivot_longer(
     cols = Jan:Dec,
     names_to = "month",
@@ -63,22 +59,25 @@ unemp_clean = unemp <- read_csv("fivethirtyeight_datasets/unemployment.csv")|>
                         Jul="July", Aug="August", Sep="September",
                         Oct="October", Nov="November", Dec="December")) |>
   rename(year = Year)
-
+unemp_df
 
 ```
 
 ```{r}
-merged_data = pols_clean |>
-  left_join(snp_clean, by = c("year", "month")) |>
-  left_join(unemp_clean, by = c("year", "month"))
+merged_df = pols_df |>
+  left_join(snp_df, by = c("year", "month")) |>
+  left_join(unemp_df, by = c("year", "month"))
 
+merged_df
+```
+
+```{r}
 tibble(
-  Rows = nrow(merged_data),
-  Columns = ncol(merged_data),
-  Year_Min = min(merged_data$year, na.rm = TRUE),
-  Year_Max = max(merged_data$year, na.rm = TRUE)
+  Rows = nrow(merged_df),
+  Columns = ncol(merged_df),
+  Year_Min = min(merged_df$year, na.rm = TRUE),
+  Year_Max = max(merged_df$year, na.rm = TRUE)
 )
-
 ```
 
 
