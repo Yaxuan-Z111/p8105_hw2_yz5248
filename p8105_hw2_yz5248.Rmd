@@ -179,8 +179,8 @@ The dataset contains `r nrow(zori_merged)` total observations, covering `r n_dis
 missing_zips <- setdiff(zip_df$zip, zori_long$zip)
 missing_zips
 ```
-169 ZIP codes appear in the ZIP code dataset but not in the Zillow Rental Price dataset.
-
+169 ZIP codes appear in the ZIP code dataset but not in the Zillow Rental Price dataset.  
+Many ZIP codes in the master dataset do not appear in the Zillow ZORI dataset because they lack sufficient residential rental data. For example, ZIP codes like 10499 (a USPS facility in the Bronx) and many 101xx codes in Midtown Manhattan are primarily assigned to large buildings or corporate offices, with little to no housing. Others, such as 11430 (covering JFK Airport) or 10474 (an industrial area), have few rental units and therefore cannot produce a reliable rent index.   
 
 ```{r}
 jan2020 = zori_long |> 
@@ -205,7 +205,7 @@ top10_drops = comp |>
 
 top10_drops
 ```
-
+The result shows that the ZIP codes with the largest rent declines between January 2020 and January 2021 are concentrated in Manhattan. The area typically have high rents and are home to many young professionals and office workers. During the pandemic, remote work, business closures, and outmigration reduced demand for centrally located apartments, driving sharp price drops. This pattern highlights how the pandemic disproportionately affected dense urban rental markets compared to outer-borough or suburban areas.  
 
 
 
