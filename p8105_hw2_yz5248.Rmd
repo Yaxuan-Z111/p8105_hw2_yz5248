@@ -88,14 +88,14 @@ resulting dataset is a tidy, merged compilation of political, economic, and fina
 ```{r}
 mr_trash_wheel = read_excel(
   "202409 Trash Wheel Collection Data.xlsx",sheet = "Mr. Trash Wheel", skip = 1) |>
-  janitor::clean_names() |>       # make column names snake_case
-  filter(!is.na(dumpster)) |>     # keep only rows with data
+  janitor::clean_names() |>      
+  filter(!is.na(dumpster)) |>    
   mutate(
     year = as.integer(year),
     sports_balls = as.integer(round(sports_balls)),
     trash_wheel = "Mr. Trash Wheel"
   )
-
+mr_trash_wheel
 ```
 
 ```{r}
@@ -109,7 +109,10 @@ prof_trash_wheel = read_excel(
   mutate(
     year = as.integer(year)
   )
+prof_trash_wheel
+```
 
+```{r}
 gwynnda = read_excel(
   "202409 Trash Wheel Collection Data.xlsx",
   sheet = "Gwynnda Trash Wheel",
@@ -120,9 +123,12 @@ gwynnda = read_excel(
   mutate(
     year = as.integer(year)
   )
+gwynnda
 
 trash_wheel_data = bind_rows(mr_trash_wheel, prof_trash_wheel, gwynnda)
+trash_wheel_data
 ```
+The combined trash collection dataset contains `r nrow(trash_wheel_data)` observations across multiple trash wheels, including Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda. Key variables include `dumpster`, `month`, `year`, `weight_tons` (the weight of trash collected), `cigarette_butts`, `plastic_bottles`, and `trash_wheel` (the collector). Across the available data, the total weight of trash collected by Professor Trash Wheel was `r sum(trash_wheel_data$weight_tons[trash_wheel_data$trash_wheel == "Professor Trash Wheel"], na.rm = TRUE)` tons. In June 2022, Gwynnda collected a total of `r sum(trash_wheel_data$cigarette_butts[trash_wheel_data$trash_wheel == "Gwynnda" & trash_wheel_data$month == "June" & trash_wheel_data$year == 2022], na.rm = TRUE)` cigarette butts.
 
 
 #Problem 3. 
@@ -131,13 +137,14 @@ zip_df = read_csv(
   "zillow_data/Zip Codes.csv"
   ) |> 
   janitor::clean_names() |>
-  mutate(zip = str_pad(as.character(zip_code), 5, pad = "0")) |>
-  distinct(zip, .keep_all = TRUE)
+  mutate(zip = as.character(zip_code))
 
 zori_wide = read_csv(
   "zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv"
   ) |> 
   janitor::clean_names()
+
+zip_df
 ```
 
 ```{r}
@@ -154,7 +161,7 @@ zori_long = zori_wide |>
   ) |>
   drop_na(zori)
 
-view(zori_long)
+zori_long
 ```
 
 
@@ -168,6 +175,36 @@ zori_merged
 
 The dataset contains `r nrow(zori_merged)` total observations, covering `r n_distinct(zori_long$zip)` unique ZIP codes in the ZORI data and `r n_distinct(zip_df$zip)` unique ZIP codes in the lookup table. The number of unique neighborhoods is `r n_distinct(zip_df$neighborhood)`.
 
+```{r}
+missing_zips <- setdiff(zip_df$zip, zori_long$zip)
+missing_zips
+```
+169 ZIP codes appear in the ZIP code dataset but not in the Zillow Rental Price dataset.
+
+
+```{r}
+jan2020 = zori_long |> 
+  filter(year(date) == 2020, month(date) == 1) |> 
+  select(zip, zori) |> 
+  rename(zori_2020 = zori)
+
+jan2021 = zori_long |> 
+  filter(year(date) == 2021, month(date) == 1) |> 
+  select(zip, zori) |> 
+  rename(zori_2021 = zori)
+
+comp = inner_join(jan2020, jan2021, by = "zip") |>
+  mutate(drop = zori_2021 - zori_2020) |>
+  left_join(zip_df |>
+              select(zip, neighborhood, county), 
+            by = "zip")
+
+top10_drops = comp |> 
+  arrange(drop) |> 
+  slice(1:10)
+
+top10_drops
+```
 
 
 
